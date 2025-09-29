@@ -25,6 +25,25 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Run tests
+      - name: Run Data processing script
         run: |
-          echo "Add your test command here"
+          python src/data/run_processing.py \
+          --input data/raw/house_data.csv \
+          --output data/processed/cleaned_house_data.csv
+
+      - name: Run Feature engineering script
+        run: |
+          python src/features/engineer.py \
+          --input data/processed/cleaned_house_data.csv \
+          --output data/processed/featured_house_data.csv \
+          --preprocessor models/trained/preprocessor.pkl
+
+      - name: Run Model training script
+        run: |
+          - name: Run Feature engineering script
+        run: |
+          python src/models/train_model.py \
+          --config configs/model_config.yaml \
+          --data data/processed/featured_house_data.csv \
+          --models-dir models \
+          --mlflow-tracking-uri http://localhost:5555
